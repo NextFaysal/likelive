@@ -1,7 +1,10 @@
 # Nixpacks configuration for LikeLive - Next.js + Prisma + PostgreSQL
+# Prisma 7.8.0 requires Node ^20.19 || ^22.12 || >=24.0
+# Nixpkgs nodejs_22 provides v22.11.0 (too old), so we install Node 22.14.0 manually
 
 [phases.setup]
-nixPkgs = ['openssl']
+nixPkgs = ['openssl', 'curl']
+cmds = ['curl -fsSL https://nodejs.org/dist/v22.14.0/node-v22.14.0-linux-x64.tar.gz | tar -xz --strip-components=1 -C /usr/local/']
 
 [phases.install]
 cmds = ['npm ci']
