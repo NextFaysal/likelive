@@ -1,0 +1,139 @@
+"use client"
+
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Video } from "lucide-react"
+
+export default function RegisterPage() {
+  const router = useRouter()
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError("")
+
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || "Something went wrong")
+        setLoading(false)
+        return
+      }
+
+      router.push("/login")
+    } catch {
+      setError("Something went wrong")
+      setLoading(false)
+    }
+  }
+
+  return (
+    <Card className="border-white/10 bg-white/5 backdrop-blur-xl">
+      <CardHeader className="text-center">
+        <div className="flex justify-center mb-4">
+          <div className="p-3 rounded-full bg-purple-500/20">
+            <Video className="h-8 w-8 text-purple-400" />
+          </div>
+        </div>
+        <CardTitle className="text-2xl text-white">Create Account</CardTitle>
+        <CardDescription className="text-slate-400">
+          Join LikeLive for real-time video calling
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="p-3 rounded-md bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+              {error}
+            </div>
+          )}
+          <div className="space-y-2">
+            <Label htmlFor="name" className="text-slate-300">
+              Name
+            </Label>
+            <Input
+              id="name"
+              type="text"
+              placeholder="Your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="bg-white/5 border-white/10 text-white placeholder:text-slate-500"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-slate-300">
+              Email
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="bg-white/5 border-white/10 text-white placeholder:text-slate-500"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password" className="text-slate-300">
+              Password
+            </Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+              className="bg-white/5 border-white/10 text-white placeholder:text-slate-500"
+            />
+          </div>
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+          >
+            {loading ? "Creating account..." : "Create Account"}
+          </Button>
+        </form>
+      </CardContent>
+      <CardFooter className="justify-center">
+        <p className="text-slate-400 text-sm">
+          Already have an account?{" "}
+          <Link
+            href="/login"
+            className="text-purple-400 hover:text-purple-300 font-medium"
+          >
+            Sign in
+          </Link>
+        </p>
+      </CardFooter>
+    </Card>
+  )
+}

@@ -1,62 +1,70 @@
-# 🎥 LiveKit Video Calling App — Full Project Documentation
+# 🎥 LikeLive — LiveKit Video Calling App
 
-> **Stack:** Next.js 14 (App Router) · LiveKit · PostgreSQL + Prisma · OpenRouter AI · Cloudflare R2  
-> **Features:** 1-to-1 Call · 1-to-Many Broadcast · Many-to-Many Conference · AI Transcription · Recording · Chat
+> A full-featured real-time video calling application built with **Next.js**, **LiveKit**, **PostgreSQL + Prisma**, **OpenRouter AI**, and **Cloudflare R2**.
 
 ---
 
 ## 📋 Table of Contents
 
-1. [Project Overview](#project-overview)
-2. [Tech Stack](#tech-stack)
-3. [Project Structure](#project-structure)
-4. [Database Schema](#database-schema)
-5. [Environment Variables](#environment-variables)
-6. [LiveKit Setup](#livekit-setup)
-7. [Feature: 1-to-1 Video Call](#feature-1-to-1-video-call)
-8. [Feature: 1-to-Many Broadcast](#feature-1-to-many-broadcast)
-9. [Feature: Many-to-Many Conference](#feature-many-to-many-conference)
-10. [Feature: AI Transcription (OpenRouter)](#feature-ai-transcription-openrouter)
-11. [Feature: Recording (Cloudflare R2)](#feature-recording-cloudflare-r2)
-12. [Feature: In-Call Chat](#feature-in-call-chat)
-13. [API Routes](#api-routes)
-14. [Installation & Setup](#installation--setup)
-15. [Deployment](#deployment)
+- [Project Overview](#-project-overview)
+- [Call Types](#-call-types)
+- [Tech Stack](#-tech-stack)
+- [Project Structure](#-project-structure)
+- [Database Schema](#-database-schema)
+- [Features](#-features)
+  - [1-to-1 Video Call](#-1-to-1-video-call)
+  - [1-to-Many Broadcast](#-1-to-many-broadcast)
+  - [Many-to-Many Conference](#-many-to-many-conference)
+  - [AI Transcription (OpenRouter)](#-ai-transcription-openrouter)
+  - [Recording (Cloudflare R2)](#-recording-cloudflare-r2)
+  - [In-Call Chat](#-in-call-chat)
+- [API Routes](#-api-routes)
+- [Environment Variables](#-environment-variables)
+- [Installation & Setup](#-installation--setup)
+- [Deployment](#-deployment)
+- [Security Checklist](#-security-checklist)
+- [Future Enhancements](#-future-enhancements)
+- [License](#-license)
 
 ---
 
 ## 🧩 Project Overview
 
-Ekta full-featured video calling application ja **LiveKit** use kore real-time communication handle korbe. Tin dharoner call support korbe:
+LikeLive is a comprehensive video calling platform that uses **LiveKit** for real-time communication. It supports three distinct call modes, AI-powered transcription, cloud recording, and in-call messaging — all built on a modern Next.js architecture.
+
+---
+
+## 📞 Call Types
 
 | Call Type | Description | Max Participants |
 |-----------|-------------|-----------------|
-| **1-to-1** | Private video call duijoner modhye | 2 |
-| **1-to-Many** | Host broadcast kore, others shudhu dekhe | Unlimited viewers |
-| **Many-to-Many** | Conference call — shobai active participant | Up to 50 |
+| **1-to-1** | Private video call between two people | 2 |
+| **1-to-Many** | Host broadcasts, others only watch | Unlimited viewers |
+| **Many-to-Many** | Conference call — everyone is an active participant | Up to 50 |
 
 ---
 
 ## 🛠️ Tech Stack
 
-```
-Frontend:       Next.js 14 (App Router, TypeScript)
-Styling:        Tailwind CSS + shadcn/ui
-Video SDK:      LiveKit Client SDK (@livekit/components-react)
-Backend:        Next.js API Routes (Server Actions)
-Database:       PostgreSQL + Prisma ORM
-AI:             OpenRouter.ai (Whisper/Transcription models)
-Storage:        Cloudflare R2 (recordings)
-Auth:           NextAuth.js (or Clerk)
-LiveKit Server: LiveKit Cloud or self-hosted
-```
+| Category | Technology |
+|----------|-----------|
+| **Frontend** | Next.js 16 (App Router, TypeScript) |
+| **Styling** | Tailwind CSS + shadcn/ui |
+| **Video SDK** | LiveKit Client SDK (`@livekit/components-react`) |
+| **Backend** | Next.js API Routes (Server Actions) |
+| **Database** | PostgreSQL + Prisma ORM |
+| **AI** | OpenRouter.ai (Whisper / Transcription models) |
+| **Storage** | Cloudflare R2 (recordings) |
+| **Auth** | NextAuth.js (or Clerk) |
+| **LiveKit Server** | LiveKit Cloud or self-hosted |
+| **Design** | shadcn/ui |
 
 ---
 
 ## 📁 Project Structure
 
 ```
-livekit-video-app/
+likelive/
 ├── app/
 │   ├── (auth)/
 │   │   ├── login/page.tsx
@@ -89,7 +97,10 @@ livekit-video-app/
 │   │   │   └── transcribe/route.ts     # AI transcription
 │   │   └── chat/
 │   │       └── [roomId]/route.ts       # Chat messages
-│   └── layout.tsx
+│   ├── layout.tsx
+│   ├── page.tsx
+│   ├── globals.css
+│   └── favicon.ico
 ├── components/
 │   ├── ui/                             # shadcn components
 │   └── shared/
@@ -97,28 +108,38 @@ livekit-video-app/
 │       └── RecordingCard.tsx
 ├── lib/
 │   ├── livekit.ts                      # LiveKit server utils
-│   ├── prisma.ts                       # Prisma client
+│   ├── prisma.ts                       # Prisma client singleton
 │   ├── r2.ts                           # Cloudflare R2 client
 │   └── openrouter.ts                   # OpenRouter AI client
 ├── prisma/
-│   └── schema.prisma
+│   └── schema.prisma                   # Database schema
 ├── hooks/
-│   ├── useRoom.ts
-│   ├── useChat.ts
-│   └── useRecording.ts
+│   ├── useRoom.ts                      # Room state management
+│   ├── useChat.ts                      # Chat functionality
+│   └── useRecording.ts                 # Recording controls
 ├── types/
-│   └── index.ts
-├── .env.local
-└── package.json
+│   └── index.ts                        # TypeScript type definitions
+├── public/
+│   ├── file.svg
+│   ├── globe.svg
+│   ├── next.svg
+│   ├── vercel.svg
+│   └── window.svg
+├── .env.local                          # Environment variables
+├── next.config.ts
+├── package.json
+├── tsconfig.json
+├── postcss.config.mjs
+└── eslint.config.mjs
 ```
 
 ---
 
 ## 🗄️ Database Schema
 
-```prisma
-// prisma/schema.prisma
+### Prisma Schema (`prisma/schema.prisma`)
 
+```prisma
 generator client {
   provider = "prisma-client-js"
 }
@@ -147,9 +168,9 @@ model Room {
   id           String      @id @default(cuid())
   name         String
   description  String?
-  type         RoomType    @default(CONFERENCE)   // ONE_TO_ONE | BROADCAST | CONFERENCE
-  status       RoomStatus  @default(WAITING)       // WAITING | ACTIVE | ENDED
-  livekitRoom  String      @unique                 // LiveKit room name
+  type         RoomType    @default(CONFERENCE)
+  status       RoomStatus  @default(WAITING)
+  livekitRoom  String      @unique
   maxParticipants Int      @default(50)
   isRecording  Boolean     @default(false)
   hostId       String
@@ -179,7 +200,7 @@ model Participant {
   id        String   @id @default(cuid())
   roomId    String
   userId    String
-  role      ParticipantRole @default(VIEWER)  // HOST | SPEAKER | VIEWER
+  role      ParticipantRole @default(VIEWER)
   joinedAt  DateTime @default(now())
   leftAt    DateTime?
 
@@ -241,7 +262,7 @@ model Transcript {
   roomId      String
   recordingId String?
   content     String   // Full transcript text
-  language    String   @default("bn")  // Bengali default
+  language    String   @default("bn")
   model       String   // AI model used
   createdAt   DateTime @default(now())
 
@@ -252,103 +273,16 @@ model Transcript {
 
 ---
 
-## 🔐 Environment Variables
+## ✨ Features
 
-```bash
-# .env.local
+### 1-to-1 Video Call
 
-# Database
-DATABASE_URL="postgresql://user:password@localhost:5432/livekit_app"
+- Host creates a room with `ONE_TO_ONE` type
+- Invite link is shared with the second participant
+- Room locks automatically after 2 participants join
+- Both participants have publish/subscribe permissions
 
-# NextAuth
-NEXTAUTH_SECRET="your-secret-key"
-NEXTAUTH_URL="http://localhost:3000"
-
-# LiveKit
-LIVEKIT_URL="wss://your-app.livekit.cloud"
-LIVEKIT_API_KEY="your-livekit-api-key"
-LIVEKIT_API_SECRET="your-livekit-api-secret"
-
-# OpenRouter AI
-OPENROUTER_API_KEY="sk-or-v1-your-openrouter-key"
-OPENROUTER_BASE_URL="https://openrouter.ai/api/v1"
-
-# Cloudflare R2
-R2_ACCOUNT_ID="your-cloudflare-account-id"
-R2_ACCESS_KEY_ID="your-r2-access-key"
-R2_SECRET_ACCESS_KEY="your-r2-secret-key"
-R2_BUCKET_NAME="livekit-recordings"
-R2_PUBLIC_URL="https://pub-xxx.r2.dev"  # Public bucket URL (optional)
-
-# App
-NEXT_PUBLIC_APP_URL="http://localhost:3000"
-NEXT_PUBLIC_LIVEKIT_URL="wss://your-app.livekit.cloud"
-```
-
----
-
-## 🎙️ LiveKit Setup
-
-### Install Dependencies
-
-```bash
-npm install livekit-server-sdk @livekit/components-react @livekit/components-core livekit-client
-```
-
-### Token Generator (`lib/livekit.ts`)
-
-```typescript
-import { AccessToken, RoomServiceClient } from 'livekit-server-sdk';
-
-const livekitHost = process.env.LIVEKIT_URL!;
-const apiKey = process.env.LIVEKIT_API_KEY!;
-const apiSecret = process.env.LIVEKIT_API_SECRET!;
-
-export const roomService = new RoomServiceClient(
-  livekitHost.replace('wss://', 'https://'),
-  apiKey,
-  apiSecret
-);
-
-export interface TokenOptions {
-  roomName: string;
-  participantName: string;
-  participantId: string;
-  role: 'host' | 'speaker' | 'viewer';
-}
-
-export async function generateToken(options: TokenOptions): Promise<string> {
-  const at = new AccessToken(apiKey, apiSecret, {
-    identity: options.participantId,
-    name: options.participantName,
-  });
-
-  const canPublish = options.role === 'host' || options.role === 'speaker';
-  const canSubscribe = true;
-
-  at.addGrant({
-    roomJoin: true,
-    room: options.roomName,
-    canPublish,
-    canSubscribe,
-    canPublishData: true,  // for chat messages
-  });
-
-  return at.toJwt();
-}
-```
-
----
-
-## 📞 Feature: 1-to-1 Video Call
-
-### How it works:
-- Host ekta room create kore `ONE_TO_ONE` type diye
-- Invite link share kore second participant er shathe
-- Maximum 2 joner pore room lock hoy
-- Dujoner-i publish/subscribe permission thake
-
-### API Route (`app/api/livekit/token/route.ts`)
+**Token Generation** (`app/api/livekit/token/route.ts`):
 
 ```typescript
 import { NextRequest, NextResponse } from 'next/server';
@@ -361,7 +295,6 @@ export async function POST(req: NextRequest) {
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { roomId } = await req.json();
-
   const room = await prisma.room.findUnique({
     where: { id: roomId },
     include: { participants: true },
@@ -388,7 +321,7 @@ export async function POST(req: NextRequest) {
 }
 ```
 
-### Component (`app/room/[roomId]/components/VideoRoom.tsx`)
+**VideoRoom Component** (`app/room/[roomId]/components/VideoRoom.tsx`):
 
 ```tsx
 'use client';
@@ -396,9 +329,6 @@ export async function POST(req: NextRequest) {
 import {
   LiveKitRoom,
   VideoConference,
-  GridLayout,
-  ParticipantTile,
-  useTracks,
   ControlBar,
 } from '@livekit/components-react';
 import '@livekit/components-styles';
@@ -412,13 +342,7 @@ export default function VideoRoom({ token, roomType }: VideoRoomProps) {
   const livekitUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL!;
 
   return (
-    <LiveKitRoom
-      token={token}
-      serverUrl={livekitUrl}
-      connect={true}
-      video={true}
-      audio={true}
-    >
+    <LiveKitRoom token={token} serverUrl={livekitUrl} connect={true} video={true} audio={true}>
       {roomType === 'ONE_TO_ONE' && <OneToOneView />}
       {roomType === 'BROADCAST' && <BroadcastView />}
       {roomType === 'CONFERENCE' && <ConferenceView />}
@@ -428,23 +352,20 @@ export default function VideoRoom({ token, roomType }: VideoRoomProps) {
 }
 
 function OneToOneView() {
-  return (
-    <VideoConference />  // LiveKit built-in — 2 participant optimize
-  );
+  return <VideoConference />;  // LiveKit built-in — optimized for 2 participants
 }
 ```
 
 ---
 
-## 📡 Feature: 1-to-Many Broadcast
+### 1-to-Many Broadcast
 
-### How it works:
-- Host video publish kore (camera + screen share)
-- Viewers shudhu subscribe kore, publish korte parbe na
-- Viewers count unlimited
-- Host-e role change dite parbe (viewer → speaker)
+- Host publishes video (camera + screen share)
+- Viewers can only subscribe, cannot publish
+- Unlimited viewer count
+- Host can promote viewers to speakers (role change)
 
-### Broadcast Component (`components/BroadcastView.tsx`)
+**BroadcastView Component** (`components/BroadcastView.tsx`):
 
 ```tsx
 'use client';
@@ -475,12 +396,8 @@ export function BroadcastView({ isHost }: { isHost: boolean }) {
       {/* Host controls */}
       {isHost && (
         <div className="flex gap-4 p-4 justify-center">
-          <button onClick={() => localParticipant.setCameraEnabled(true)}>
-            📷 Camera On
-          </button>
-          <button onClick={() => localParticipant.setScreenShareEnabled(true)}>
-            🖥 Share Screen
-          </button>
+          <button onClick={() => localParticipant.setCameraEnabled(true)}>📷 Camera On</button>
+          <button onClick={() => localParticipant.setScreenShareEnabled(true)}>🖥 Share Screen</button>
         </div>
       )}
     </div>
@@ -490,15 +407,14 @@ export function BroadcastView({ isHost }: { isHost: boolean }) {
 
 ---
 
-## 👥 Feature: Many-to-Many Conference
+### Many-to-Many Conference
 
-### How it works:
-- Shobai publish + subscribe korte pare
-- Grid layout e sob participant dekhay
-- Max 50 participant support
-- Screen share + audio + video toggle
+- Everyone can publish and subscribe
+- Grid layout displays all participants
+- Up to 50 participants supported
+- Screen share + audio + video toggle for each participant
 
-### Conference Grid (`components/ParticipantGrid.tsx`)
+**ConferenceView Component** (`components/ParticipantGrid.tsx`):
 
 ```tsx
 'use client';
@@ -522,11 +438,8 @@ export function ConferenceView() {
 
   return (
     <div className="h-full">
-      <RoomAudioRenderer />  {/* Audio playback */}
-      <GridLayout
-        tracks={tracks}
-        style={{ height: 'calc(100vh - 80px)' }}
-      >
+      <RoomAudioRenderer />
+      <GridLayout tracks={tracks} style={{ height: 'calc(100vh - 80px)' }}>
         <ParticipantTile />
       </GridLayout>
     </div>
@@ -536,23 +449,21 @@ export function ConferenceView() {
 
 ---
 
-## 🤖 Feature: AI Transcription (OpenRouter)
+### AI Transcription (OpenRouter)
 
-### How it works:
-1. Call shesh howar pore recording Cloudflare R2 te save hoy
-2. Recording er audio extract hoy
-3. OpenRouter e pathano hoy (Whisper model via OpenRouter)
-4. Transcript database e save hoy
-5. User dashboard e transcript dekhte pare
+1. After a call ends, the recording is saved to Cloudflare R2
+2. Audio is extracted from the recording
+3. Sent to OpenRouter (Whisper model) for transcription
+4. Transcript is saved to the database
+5. Users can view transcripts from their dashboard
 
-### OpenRouter Client (`lib/openrouter.ts`)
+**OpenRouter Client** (`lib/openrouter.ts`):
 
 ```typescript
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY!;
 
 export async function transcribeAudio(audioUrl: string): Promise<string> {
-  // Option 1: Text-based transcription request (if audio already processed)
   const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
     method: 'POST',
     headers: {
@@ -561,13 +472,8 @@ export async function transcribeAudio(audioUrl: string): Promise<string> {
       'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL!,
     },
     body: JSON.stringify({
-      model: 'openai/whisper-large-v3',  // via OpenRouter
-      messages: [
-        {
-          role: 'user',
-          content: `Please transcribe this audio file: ${audioUrl}`,
-        },
-      ],
+      model: 'openai/whisper-large-v3',
+      messages: [{ role: 'user', content: `Please transcribe this audio file: ${audioUrl}` }],
     }),
   });
 
@@ -584,16 +490,10 @@ export async function summarizeTranscript(transcript: string): Promise<string> {
       'HTTP-Referer': process.env.NEXT_PUBLIC_APP_URL!,
     },
     body: JSON.stringify({
-      model: 'anthropic/claude-3-haiku',  // Fast, cheap model for summarization
+      model: 'anthropic/claude-3-haiku',
       messages: [
-        {
-          role: 'system',
-          content: 'You are a meeting summarizer. Provide key points in bullet format.',
-        },
-        {
-          role: 'user',
-          content: `Summarize this meeting transcript:\n\n${transcript}`,
-        },
+        { role: 'system', content: 'You are a meeting summarizer. Provide key points in bullet format.' },
+        { role: 'user', content: `Summarize this meeting transcript:\n\n${transcript}` },
       ],
     }),
   });
@@ -603,7 +503,7 @@ export async function summarizeTranscript(transcript: string): Promise<string> {
 }
 ```
 
-### Transcription API Route (`app/api/ai/transcribe/route.ts`)
+**Transcription API** (`app/api/ai/transcribe/route.ts`):
 
 ```typescript
 import { NextRequest, NextResponse } from 'next/server';
@@ -613,21 +513,14 @@ import { getR2SignedUrl } from '@/lib/r2';
 
 export async function POST(req: NextRequest) {
   const { recordingId } = await req.json();
-
-  const recording = await prisma.recording.findUnique({
-    where: { id: recordingId },
-  });
+  const recording = await prisma.recording.findUnique({ where: { id: recordingId } });
 
   if (!recording) return NextResponse.json({ error: 'Recording not found' }, { status: 404 });
 
-  // Get temporary signed URL from R2
   const audioUrl = await getR2SignedUrl(recording.r2Key);
-
-  // Transcribe
   const transcriptText = await transcribeAudio(audioUrl);
   const summary = await summarizeTranscript(transcriptText);
 
-  // Save to DB
   const transcript = await prisma.transcript.create({
     data: {
       roomId: recording.roomId,
@@ -643,17 +536,16 @@ export async function POST(req: NextRequest) {
 
 ---
 
-## 🎬 Feature: Recording (Cloudflare R2)
+### Recording (Cloudflare R2)
 
-### How it works:
-1. Host "Start Recording" button click kore
-2. LiveKit Egress API call hoy server-side e
-3. LiveKit recording start kore (MP4 format)
-4. Recording shesh hole LiveKit webhook trigger hoy
-5. File Cloudflare R2 te upload hoy automatically (via LiveKit Egress config)
-6. Database e recording entry save hoy
+1. Host clicks "Start Recording" button
+2. LiveKit Egress API is called server-side
+3. LiveKit starts recording in MP4 format
+4. When recording ends, a LiveKit webhook is triggered
+5. File is automatically uploaded to Cloudflare R2 (via LiveKit Egress config)
+6. Recording entry is saved in the database
 
-### R2 Client (`lib/r2.ts`)
+**R2 Client** (`lib/r2.ts`):
 
 ```typescript
 import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
@@ -673,12 +565,11 @@ export async function getR2SignedUrl(key: string, expiresIn = 3600): Promise<str
     Bucket: process.env.R2_BUCKET_NAME!,
     Key: key,
   });
-
   return getSignedUrl(r2Client, command, { expiresIn });
 }
 ```
 
-### Start Recording (`app/api/recording/start/route.ts`)
+**Start Recording** (`app/api/recording/start/route.ts`):
 
 ```typescript
 import { NextRequest, NextResponse } from 'next/server';
@@ -697,13 +588,11 @@ export async function POST(req: NextRequest) {
   if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const { roomId } = await req.json();
-
   const room = await prisma.room.findUnique({ where: { id: roomId } });
   if (!room) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
 
   const r2Key = `recordings/${roomId}/${Date.now()}.mp4`;
 
-  // Configure R2 upload via LiveKit Egress
   const output = new EncodedFileOutput({
     fileType: 'MP4',
     filepath: r2Key,
@@ -716,67 +605,42 @@ export async function POST(req: NextRequest) {
     }),
   });
 
-  // Start LiveKit Egress recording
   const egressInfo = await egressClient.startRoomCompositeEgress(
     room.livekitRoom,
     { file: output },
-    {
-      layout: 'grid',
-      audioOnly: false,
-    }
+    { layout: 'grid', audioOnly: false }
   );
 
-  // Save recording to DB
   const recording = await prisma.recording.create({
-    data: {
-      roomId,
-      userId: session.user.id,
-      r2Key,
-      status: 'PROCESSING',
-    },
+    data: { roomId, userId: session.user.id, r2Key, status: 'PROCESSING' },
   });
 
-  // Update room recording status
-  await prisma.room.update({
-    where: { id: roomId },
-    data: { isRecording: true },
-  });
+  await prisma.room.update({ where: { id: roomId }, data: { isRecording: true } });
 
   return NextResponse.json({ recording, egressId: egressInfo.egressId });
 }
 ```
 
-### LiveKit Webhook (`app/api/livekit/webhook/route.ts`)
+**LiveKit Webhook** (`app/api/livekit/webhook/route.ts`):
 
 ```typescript
 import { NextRequest, NextResponse } from 'next/server';
 import { WebhookReceiver } from 'livekit-server-sdk';
 import { prisma } from '@/lib/prisma';
 
-const receiver = new WebhookReceiver(
-  process.env.LIVEKIT_API_KEY!,
-  process.env.LIVEKIT_API_SECRET!
-);
+const receiver = new WebhookReceiver(process.env.LIVEKIT_API_KEY!, process.env.LIVEKIT_API_SECRET!);
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
   const authHeader = req.headers.get('Authorization');
-
   const event = receiver.receive(body, authHeader!);
 
   switch (event.event) {
     case 'egress_ended':
-      // Recording complete — update DB
       await prisma.recording.updateMany({
         where: { r2Key: { contains: event.egressInfo?.roomName } },
-        data: {
-          status: 'READY',
-          endedAt: new Date(),
-        },
+        data: { status: 'READY', endedAt: new Date() },
       });
-
-      // Auto-trigger transcription
-      // (Optional: queue a job here)
       break;
 
     case 'room_finished':
@@ -793,15 +657,14 @@ export async function POST(req: NextRequest) {
 
 ---
 
-## 💬 Feature: In-Call Chat
+### In-Call Chat
 
-### How it works:
-- LiveKit DataChannel use kore real-time chat
-- Messages simultaneously database e save hoy
-- Emojis, text support
-- Chat history room shesh hole accessible
+- Real-time chat via LiveKit DataChannel
+- Messages are simultaneously saved to the database
+- Supports text and emojis
+- Chat history is accessible after the room ends
 
-### Chat Hook (`hooks/useChat.ts`)
+**Chat Hook** (`hooks/useChat.ts`):
 
 ```typescript
 import { useDataChannel, useLocalParticipant } from '@livekit/components-react';
@@ -849,42 +712,82 @@ export function useChat(roomId: string) {
 
 ---
 
-## 🔌 API Routes Summary
+## 🔌 API Routes
 
 | Method | Route | Description |
 |--------|-------|-------------|
-| `POST` | `/api/rooms` | Create new room |
+| `POST` | `/api/rooms` | Create a new room |
 | `GET` | `/api/rooms` | List all rooms |
 | `GET` | `/api/rooms/[roomId]` | Get room details |
-| `DELETE` | `/api/rooms/[roomId]` | Delete room |
-| `POST` | `/api/livekit/token` | Generate join token |
-| `POST` | `/api/livekit/webhook` | LiveKit event webhook |
-| `POST` | `/api/recording/start` | Start recording |
-| `POST` | `/api/recording/stop` | Stop recording |
-| `GET` | `/api/recording/list` | List recordings |
-| `POST` | `/api/ai/transcribe` | Transcribe recording |
-| `GET` | `/api/chat/[roomId]` | Get chat history |
-| `POST` | `/api/chat/[roomId]` | Send chat message |
+| `DELETE` | `/api/rooms/[roomId]` | Delete a room |
+| `POST` | `/api/livekit/token` | Generate a LiveKit join token |
+| `POST` | `/api/livekit/webhook` | Receive LiveKit event webhooks |
+| `POST` | `/api/recording/start` | Start room recording |
+| `POST` | `/api/recording/stop` | Stop room recording |
+| `GET` | `/api/recording/list` | List all recordings |
+| `POST` | `/api/ai/transcribe` | Transcribe a recording via AI |
+| `GET` | `/api/chat/[roomId]` | Get chat history for a room |
+| `POST` | `/api/chat/[roomId]` | Send a chat message |
 
 ---
 
-## ⚙️ Installation & Setup
+## 🔑 Environment Variables
 
-### 1. Project Initialize
+Create a `.env.local` file in the project root with the following variables:
 
-```bash
-npx create-next-app@latest livekit-video-app --typescript --tailwind --app
-cd livekit-video-app
+```env
+# Database
+DATABASE_URL="postgresql://user:password@localhost:5432/likelive"
+
+# LiveKit
+LIVEKIT_URL="wss://your-project.livekit.cloud"
+LIVEKIT_API_KEY="your-api-key"
+LIVEKIT_API_SECRET="your-api-secret"
+NEXT_PUBLIC_LIVEKIT_URL="wss://your-project.livekit.cloud"
+
+# NextAuth
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your-nextauth-secret"
+
+# OpenRouter AI
+OPENROUTER_API_KEY="your-openrouter-api-key"
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+
+# Cloudflare R2
+R2_ACCOUNT_ID="your-account-id"
+R2_ACCESS_KEY_ID="your-access-key"
+R2_SECRET_ACCESS_KEY="your-secret-key"
+R2_BUCKET_NAME="livekit-recordings"
 ```
 
-### 2. Dependencies Install
+---
+
+## 🚀 Installation & Setup
+
+### Prerequisites
+
+- **Node.js** 18+ 
+- **PostgreSQL** running locally or remotely
+- **LiveKit Cloud** account (or self-hosted LiveKit server)
+- **Cloudflare** account with R2 enabled
+- **OpenRouter** account for AI transcription
+
+### 1. Clone & Install
+
+```bash
+git clone <your-repo-url>
+cd likelive
+npm install
+```
+
+### 2. Install Additional Dependencies
 
 ```bash
 # LiveKit
 npm install livekit-server-sdk @livekit/components-react @livekit/components-core livekit-client
 
 # Database
-npm install @prisma/client prisma
+npm install @prisma/client
 npx prisma init
 
 # Auth
@@ -894,87 +797,94 @@ npm install next-auth
 npm install @aws-sdk/client-s3 @aws-sdk/s3-request-presigner
 
 # UI
-npm install tailwindcss-animate class-variance-authority clsx
-npx shadcn-ui@latest init
+npx shadcn@latest init
 ```
 
 ### 3. Database Setup
 
 ```bash
-# .env.local e DATABASE_URL set korun
+# Set DATABASE_URL in .env.local
 npx prisma migrate dev --name init
 npx prisma generate
 ```
 
 ### 4. LiveKit Cloud Setup
 
-1. [livekit.io](https://livekit.io) e account create korun
-2. New project create korun
-3. API Key + Secret copy korun → `.env.local` e paste korun
-4. Webhook URL set korun: `https://yourdomain.com/api/livekit/webhook`
+1. Create an account at [livekit.io](https://livekit.io)
+2. Create a new project
+3. Copy the **API Key** and **API Secret** → paste into `.env.local`
+4. Set the webhook URL: `https://yourdomain.com/api/livekit/webhook`
 
 ### 5. Cloudflare R2 Setup
 
-```bash
-# Cloudflare Dashboard → R2 → Create Bucket
-# Bucket name: livekit-recordings
-# CORS policy add korun (for direct upload if needed):
-# Origin: https://yourdomain.com
-# Methods: GET, PUT, POST
-```
+1. Go to **Cloudflare Dashboard → R2 → Create Bucket**
+2. Bucket name: `livekit-recordings`
+3. Add CORS policy:
+   - Origin: `https://yourdomain.com`
+   - Methods: `GET, PUT, POST`
 
 ### 6. OpenRouter Setup
 
-1. [openrouter.ai](https://openrouter.ai) e account create korun
-2. API Key generate korun
-3. `.env.local` e `OPENROUTER_API_KEY` set korun
-4. Available models check korun: `openai/whisper-large-v3` transcription er jonno
+1. Create an account at [openrouter.ai](https://openrouter.ai)
+2. Generate an API Key
+3. Set `OPENROUTER_API_KEY` in `.env.local`
+4. Verify model availability: `openai/whisper-large-v3` for transcription
 
-### 7. Development Server
+### 7. Run Development Server
 
 ```bash
-npx prisma studio    # DB GUI
-npm run dev          # Start app on localhost:3000
+npx prisma studio    # Open DB GUI (optional)
+npm run dev          # Start app on http://localhost:3000
 ```
 
 ---
 
-## 🚀 Deployment
+## ☁️ Deployment
 
 ### Vercel (Recommended)
 
 ```bash
 npm install -g vercel
 vercel
-
-# Environment variables Vercel dashboard e add korun:
-# DATABASE_URL, LIVEKIT_*, OPENROUTER_API_KEY, R2_*, NEXTAUTH_*
 ```
 
+Add all environment variables in the **Vercel Dashboard**:
+- `DATABASE_URL`
+- `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET`, `NEXT_PUBLIC_LIVEKIT_URL`
+- `NEXTAUTH_URL`, `NEXTAUTH_SECRET`
+- `OPENROUTER_API_KEY`, `NEXT_PUBLIC_APP_URL`
+- `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`
+
+---
 
 ## 🔒 Security Checklist
 
-- [ ] API routes e authentication check (getServerSession)
-- [ ] LiveKit tokens server-side e generate hoy (never client-side)
-- [ ] R2 bucket public access disable kora (signed URLs use)
-- [ ] Webhook requests LiveKit signature verify kora
-- [ ] Rate limiting add kora API routes e
-- [ ] Room access control (participant list check)
-- [ ] Input validation + sanitization
+- [ ] Authentication check on all API routes (`getServerSession`)
+- [ ] LiveKit tokens generated server-side only (never client-side)
+- [ ] R2 bucket public access disabled (use signed URLs only)
+- [ ] LiveKit webhook requests verified with signature
+- [ ] Rate limiting on API routes
+- [ ] Room access control (participant list validation)
+- [ ] Input validation and sanitization on all endpoints
 
 ---
 
 ## 📈 Future Enhancements
 
-- [ ] **Breakout Rooms** — Conference er modhye choto group room
-- [ ] **Virtual Background** — AI background blur/replace
+- [ ] **Breakout Rooms** — Small group rooms within a conference
+- [ ] **Virtual Background** — AI-powered background blur/replacement
 - [ ] **Real-time Translation** — Live AI translation via OpenRouter
-- [ ] **Polls & Reactions** — Interactive elements during broadcast
-- [ ] **Screen Annotation** — Drawing on shared screen
-- [ ] **Meeting Summary Email** — Auto-send transcript after call
-- [ ] **Analytics Dashboard** — Call duration, participant stats
+- [ ] **Polls & Reactions** — Interactive elements during broadcasts
+- [ ] **Screen Annotation** — Drawing tools on shared screens
+- [ ] **Meeting Summary Email** — Auto-send transcript after call ends
+- [ ] **Analytics Dashboard** — Call duration, participant stats, usage metrics
 
 ---
 
-*Documentation last updated: 2025*  
-*Stack: Next.js 14 · LiveKit · PostgreSQL · OpenRouter · Cloudflare R2*
+## 📄 License
+
+This project is private and proprietary. All rights reserved.
+
+---
+
+*Built with Next.js · LiveKit · PostgreSQL · OpenRouter · Cloudflare R2*
