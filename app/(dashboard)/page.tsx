@@ -82,6 +82,22 @@ export default function DashboardPage() {
     }
   };
 
+  const deleteRoom = async (roomId: string) => {
+    try {
+      const res = await fetch(`/api/rooms/${roomId}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        fetchRooms();
+      } else {
+        const data = await res.json();
+        console.error('Failed to delete room:', data.error);
+      }
+    } catch (error) {
+      console.error('Failed to delete room:', error);
+    }
+  };
+
   if (status === 'loading') {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
@@ -207,6 +223,8 @@ export default function DashboardPage() {
               participantCount={room.participants?.length || 0}
               isRecording={room.isRecording}
               createdAt={room.createdAt}
+              isHost={room.hostId === session?.user?.id}
+              onDelete={deleteRoom}
             />
           ))
         )}

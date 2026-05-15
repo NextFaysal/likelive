@@ -1,7 +1,11 @@
+"use client"
+
+import { useState } from "react"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Users, Video, Radio, Monitor } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Users, Video, Radio, Monitor, Trash2 } from "lucide-react"
 import type { RoomType, RoomStatus } from "@/types"
 
 interface RoomCardProps {
@@ -14,6 +18,8 @@ interface RoomCardProps {
   participantCount: number
   isRecording: boolean
   createdAt: string
+  isHost: boolean
+  onDelete: (roomId: string) => void
 }
 
 const typeIcons: Record<RoomType, React.ReactNode> = {
@@ -43,26 +49,81 @@ export function RoomCard({
   maxParticipants,
   participantCount,
   isRecording,
+  isHost,
+  onDelete,
 }: RoomCardProps) {
+  const [showConfirm, setShowConfirm] = useState(false)
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setShowConfirm(true)
+  }
+
+  const handleConfirmDelete = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    onDelete(id)
+    setShowConfirm(false)
+  }
+
+  const handleCancelDelete = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setShowConfirm(false)
+  }
+
   return (
-    <Link href={`/room/${id}`}>
-      <Card className="border-white/10 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
+    <Card className="border-white/10 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <Link href={`/room/${id}`} className="flex items-center gap-2">
             <CardTitle className="text-lg text-white flex items-center gap-2">
               {typeIcons[type]}
               {name}
             </CardTitle>
-            <div className="flex items-center gap-2">
-              <Badge className={statusColors[status]}>{status}</Badge>
-              {isRecording && (
-                <Badge className="bg-red-500/20 text-red-400 border-red-500/30">
-                  REC
-                </Badge>
-              )}
-            </div>
+          </Link>
+          <div className="flex items-center gap-2">
+            <Badge className={statusColors[status]}>{status}</Badge>
+            {isRecording && (
+              <Badge className="bg-red-500/20 text-red-400 border-red-500/30">
+                REC
+              </Badge>
+            )}
+            {isHost && status !== "ENDED" && !showConfirm && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 text-slate-400 hover:text-red-400 hover:bg-red-500/10"
+                onClick={handleDeleteClick}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
+            {showConfirm && (
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 text-xs"
+                  onClick={handleConfirmDelete}
+                >
+                  Delete
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2 text-slate-400 hover:text-white hover:bg-white/10 text-xs"
+                  onClick={handleCancelDelete}
+                >
+                  Cancel
+                </Button>
+              </div>
+            )}
           </div>
-        </CardHeader>
+        </div>
+      </CardHeader>
+      <Link href={`/room/${id}`}>
         <CardContent>
           {description && (
             <p className="text-sm text-slate-400 mb-3">{description}</p>
@@ -80,7 +141,7 @@ export function RoomCard({
             </div>
           </div>
         </CardContent>
-      </Card>
-    </Link>
+      </Link>
+    </Card>
   )
 }

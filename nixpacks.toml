@@ -10,7 +10,8 @@ nixPkgs = [
 
 [phases.install]
 cmds = [
-  "npm install",
+  "npm i",
+  "npm audit fix --force",
   "npx prisma generate"
 ]
 

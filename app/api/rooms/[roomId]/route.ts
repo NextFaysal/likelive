@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
+import { RoomServiceClient } from "livekit-server-sdk"
+
+const LIVEKIT_HOST = process.env.LIVEKIT_URL || process.env.NEXT_PUBLIC_LIVEKIT_URL || ""
+const LIVEKIT_API_KEY = process.env.LIVEKIT_API_KEY!
+const LIVEKIT_API_SECRET = process.env.LIVEKIT_API_SECRET!
+
+const roomService = new RoomServiceClient(LIVEKIT_HOST, LIVEKIT_API_KEY, LIVEKIT_API_SECRET)
 
 export async function GET(
   req: NextRequest,
@@ -52,6 +59,15 @@ export async function DELETE(
     )
   }
 
+  // Close the LiveKit room on the server
+  try {
+    await roomService.deleteRoom(room.livekitRoom)
+  } catch (error) {
+    // LiveKit room may already be gone; log but don't block
+    console.warn("Failed to delete LiveKit room:", error)
+  }
+
+  // Mark the room as ENDED in the database
   await prisma.room.update({
     where: { id: roomId },
     data: { status: "ENDED", endedAt: new Date() },

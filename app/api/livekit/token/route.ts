@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
   // 1-to-1 room: max 2 participants check
   if (room.type === "ONE_TO_ONE" && room.participants.length >= 2) {
     const isAlreadyInRoom = room.participants.some(
-      (p) => p.userId === session.user.id,
+      (p: { userId: string }) => p.userId === session.user.id,
     )
     if (!isAlreadyInRoom) {
       return NextResponse.json({ error: "Room is full" }, { status: 403 })
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
 
   // Add participant if not already in room
   const existingParticipant = room.participants.find(
-    (p) => p.userId === session.user.id,
+    (p: { userId: string }) => p.userId === session.user.id,
   )
 
   if (!existingParticipant) {
