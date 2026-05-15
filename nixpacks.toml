@@ -1,7 +1,7 @@
 # Nixpacks configuration for LikeLive - Next.js + Prisma + PostgreSQL
 
 [phases.setup]
-nixPkgs = ['nodejs_22', 'openssl']
+nixPkgs = ['openssl']
 
 [phases.install]
 cmds = ['npm ci']
