@@ -1,16 +1,27 @@
-# Nixpacks configuration for LikeLive - Next.js + Prisma + PostgreSQL
-# Node.js version is specified in .node-version file (22.14.0)
-# Nixpacks will use fnm to install the correct Node version automatically
-# Do NOT override [phases.setup] — it breaks the default Node.js provider PATH setup
+# nixpacks.toml
+
+[phases.setup]
+nixPkgs = [
+  "nodejs_22",
+  "openssl",
+  "python3",
+  "pkg-config"
+]
 
 [phases.install]
-cmds = ['NODE_OPTIONS="--max-old-space-size=4096" npm ci']
+cmds = [
+  "npm install",
+  "npx prisma generate"
+]
 
 [phases.build]
 cmds = [
-  'DATABASE_URL="postgresql://neondb_owner:npg_H8qtdl9ZXUCu@ep-proud-band-apbr84hi-pooler.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require" npx prisma generate',
-  'NODE_OPTIONS="--max-old-space-size=4096" next build',
+  "npm run build"
 ]
 
 [start]
-cmd = 'npx prisma migrate deploy && next start'
+cmd = "npm run start"
+
+[variables]
+NODE_ENV = "production"
+NEXT_TELEMETRY_DISABLED = "1"
