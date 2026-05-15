@@ -4,7 +4,10 @@
 # Do NOT override [phases.setup] — it breaks the default Node.js provider PATH setup
 
 [phases.build]
-cmds = ['npx prisma generate', 'next build']
+cmds = [
+  'npm ci',
+  'next build',
+]
 
 [start]
-cmd = 'next start'
+cmd = 'npx prisma migrate deploy && next start'
