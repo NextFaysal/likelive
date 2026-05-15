@@ -3,10 +3,13 @@
 # Nixpacks will use fnm to install the correct Node version automatically
 # Do NOT override [phases.setup] — it breaks the default Node.js provider PATH setup
 
+[phases.install]
+cmds = ['NODE_OPTIONS="--max-old-space-size=4096" npm ci']
+
 [phases.build]
 cmds = [
-  'npm ci',
-  'next build',
+  'DATABASE_URL="postgresql://neondb_owner:npg_H8qtdl9ZXUCu@ep-proud-band-apbr84hi-pooler.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require" npx prisma generate',
+  'NODE_OPTIONS="--max-old-space-size=4096" next build',
 ]
 
 [start]
